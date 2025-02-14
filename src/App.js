@@ -2,6 +2,9 @@ import { Console, Random } from "@woowacourse/mission-utils";
 
 class Car {
   constructor(name) {
+    if (name.length < 1) {
+      throw new Error("이름은 최소 1자 이상입니다.")
+    }
     if (name.length > 5) {
       throw new Error("이름은 5자 이하만 가능합니다.")
     }
@@ -21,7 +24,15 @@ class Car {
 
 class RacingGame {
   constructor(carNames, counts) {
-    this.cars = carNames.split(",").map((name) => new Car(name));
+
+    const nameArray = carNames.split(",").map((name) => name.trim());
+
+    const nameCheck = new Set(nameArray);
+    if(nameCheck.size !== nameArray.length) {
+      throw new Error("중복된 이름이 있습니다. 모든 자동차 이름은 고유해야 합니다.")
+    }
+
+    this.cars = nameArray.map((name) => new Car(name));
     this.counts = counts;
   }
 
@@ -44,17 +55,23 @@ class RacingGame {
 }
 
 class App {
-  async play() {
+  async run() {
     try{
       const cars = await Console.readLineAsync(`경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분) \n`);
       if(!cars){
-        throw new Error("자동차 이름을 최소 1개 입력하세요.")
+        throw new Error("이름이 입력되지 않았습니다.")
       }
       const inputCounts = await Console.readLineAsync("시도할 회수는 몇회인가요?")
+      if(inputCounts < 1){
+        throw new Error("최소 1회 이상 시도해야 합니다.")
+      }
       const counts = parseInt(inputCounts);
+
       const game = new RacingGame(cars, counts);
       game.gameStart();
+
       Console.print("최종 우승자 : " + game.winner);
+
     }catch(error){
       throw error;
     }
