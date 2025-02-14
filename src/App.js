@@ -47,10 +47,15 @@ class RacingGame {
     });
   }
 
-  gameStart() {
+  async delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async gameStart() {
     for (let i = 0; i < this.counts; i++) {
       Console.print(`\n${i + 1}차 시도`);
       this.playRound();
+      await this.delay(1000);
     }
   }
 
@@ -81,7 +86,7 @@ class App {
       const counts = parseInt(inputCounts);
 
       const game = new RacingGame(cars, counts);
-      game.gameStart();
+      await game.gameStart();
 
       Console.print("최종 우승자 : " + game.winner);
     } catch (error) {
